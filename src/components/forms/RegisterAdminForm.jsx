@@ -29,6 +29,9 @@ const RegisterAdminForm = () => {
           progress: undefined,
           theme: 'colored',
         });
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
       })
       .catch((error) => {
         console.error(error);
