@@ -1,13 +1,16 @@
 import { ErrorMessage, useField } from 'formik'
+import { Input as MaterialInput } from '@material-tailwind/react'
 
-export const Input = ({ name, label, ...props }) => {
+const Input = ({ name, label, ...props }) => {
   const [field, meta] = useField(name)
   return (
     <div>
-      <label htmlFor={field.name}>{label}</label>
-      <input
+      <MaterialInput
+        size="lg"
+        label={label}
         {...field}
         {...props}
+        placeholder=""
       />
       <ErrorMessage
         name={field.name}
@@ -15,5 +18,7 @@ export const Input = ({ name, label, ...props }) => {
         className="text-xs text-red-500"
       />
     </div>
-  );
-};
+  )
+}
+
+export default Input

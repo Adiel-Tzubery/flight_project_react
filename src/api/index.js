@@ -1,8 +1,6 @@
 import axios from 'axios'
 
 export const http =
-  //@@@ remember to change
-
   // If the user is logged in, then we will
   // use the access token to make requests to the Django API.
   // Otherwise, we won't include the Authorization header.
@@ -25,4 +23,4 @@ export const http =
       })
 
 // reference to the start of every request
-export const FS_API_URL = 'http://127.0.0.1:8000/api'
+export const FS_API_URL = 'https://atravel.azurewebsites.net/api';

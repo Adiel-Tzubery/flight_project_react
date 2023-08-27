@@ -10,7 +10,7 @@ const registerAirline = async (props) => {
     name: props.name,
     country: props.country,
     user_role: props.userRole,
-  })
+  });
   return data
 }
 export default registerAirline

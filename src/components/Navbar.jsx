@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from 'react'
+// global state
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
-import { isLoggedIn } from './utils'
-import { default as logoutRequest } from '../api/auth/logout'
+// react + hooks
+import React, { useEffect, useState } from 'react';
 
-import { http } from '../api/index'
+// assets piqs
+import githubImage from '../assets/githubImage.png';
+import logo from '../assets/logo.png';
 
-import { Link, redirect } from 'react-router-dom'
+// api
+import { http } from '../api/index';
+import { default as logoutRequest } from '../api/auth/logout';
 
-import { useStoreState } from 'easy-peasy'
-import { useStoreActions } from 'easy-peasy'
+// router
+import { Link, useNavigate } from 'react-router-dom';
 
+// css
 import {
   Navbar,
   MobileNav,
@@ -22,83 +28,80 @@ import {
   Avatar,
   Card,
   IconButton,
-} from '@material-tailwind/react'
+} from '@material-tailwind/react';
 import {
-  CubeTransparentIcon,
   UserCircleIcon,
-  CodeBracketSquareIcon,
+  CodeBracketIcon,
   Square3Stack3DIcon,
   ChevronDownIcon,
   Cog6ToothIcon,
-  InboxArrowDownIcon,
-  LifebuoyIcon,
   PowerIcon,
-  RocketLaunchIcon,
   Bars2Icon,
   UserPlusIcon,
   UserIcon,
-} from '@heroicons/react/24/outline'
-
-
+  DocumentIcon,
+} from '@heroicons/react/24/outline';
 
 // set profile dropdown menu
-function ProfileMenu() {
+function ProfileMenu({ setLoggedIn }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const closeMenu = () => setIsMenuOpen(false);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const closeMenu = () => setIsMenuOpen(false)
+  // set and use global state
+  const setUserData = useStoreActions((action) => action.user.setUserData);
+  const userData = useStoreState((state) => state?.user?.data || null);
 
-  // user data is in global state (redux, easy-peasy)
-  const setUserData = useStoreActions((action) => action.user.setUserData)
+  // main menu navigation's
+  const navigate = useNavigate();
 
   const logOut = async () => {
-    console.debug('logOut function invoked')
+    console.debug('logOut function invoked');
 
-    // api logout request
-    const response = await logoutRequest(localStorage.getItem('refresh_token'))
-    console.debug('response:', response)
+    try {
+      // api logout request
+      const response = await logoutRequest(
+        localStorage.getItem('refresh_token')
+      );
 
-    // Delete tokens from local storage
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+      console.debug('response:', response);
 
-    // delete user data from global storage
-    setUserData(null)
+      // Delete tokens from local storage
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
 
-    // delete auth header from http client     @@@@ do i really need that?
-    delete http.defaults.headers['Authorization']
+      // delete user data from global storage
+      setUserData(null);
 
-    // redirect to root page
-    return redirect('/')
-  }
+      // delete auth header from http client
+      delete http.defaults.headers['Authorization'];
 
-  // profile menu component
+      // redirect to login page
+      return navigate('/login');
+    } catch (error) {
+      // Handle any error that might occur during logout
+      console.error('Logout error:', error);
+    }
+  };
+
+  // dropdown
   const profileMenuItems = [
     {
-      label: 'My Profile',
+      label: 'My Data',
       icon: UserCircleIcon,
-      onClick: '#',
+      onClick: () => navigate('/user-data'),
     },
     {
       label: 'Edit Profile',
       icon: Cog6ToothIcon,
-      onClick: '#',
-    },
-    {
-      label: 'Inbox',
-      icon: InboxArrowDownIcon,
-      onClick: '#',
-    },
-    {
-      label: 'Help',
-      icon: LifebuoyIcon,
-      onClick: '#',
+      onClick: () => navigate('/update-user'),
     },
     {
       label: 'Sign Out',
       icon: PowerIcon,
       onClick: logOut,
     },
-  ]
+  ];
+
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
@@ -107,13 +110,15 @@ function ProfileMenu() {
           color="blue-gray"
           className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
         >
-          {/* add if statement for avatar piq */}
+          {/* profile picture */}
           <Avatar
             variant="circular"
             size="sm"
             alt="tania andrew"
             className="border border-blue-500 p-0.5"
-            src={`https://api.dicebear.com/6.x/bottts-neutral/svg`} // it'll be, don't worry
+            src={`https://api.dicebear.com/6.x/bottts-neutral/svg?seed=${
+              userData ? userData.username : null
+            }`}
           />
           <ChevronDownIcon
             strokeWidth={2.5}
@@ -125,13 +130,13 @@ function ProfileMenu() {
       </MenuHandler>
       <MenuList className="p-1">
         {profileMenuItems.map(({ label, icon: Icon, onClick }, key) => {
-          const isLastItem = key === profileMenuItems.length - 1
+          const isLastItem = key === profileMenuItems.length - 1;
           return (
             <MenuItem
               key={label}
               onClick={() => {
-                closeMenu()
-                onClick()
+                closeMenu();
+                onClick();
               }}
               className={`flex items-center gap-2 rounded ${
                 isLastItem ? 'last-item' : ''
@@ -150,42 +155,47 @@ function ProfileMenu() {
                 {label}
               </Typography>
             </MenuItem>
-          )
+          );
         })}
       </MenuList>
     </Menu>
-  )
+  );
 }
 
-// nav list menu
+// navbar middle menu list
 const navListMenuItems = [
   {
-    title: '@material-tailwind/html',
-    description:
-      'Learn how to use @material-tailwind/html, packed with rich components and widgets.',
+    title: 'django github repository',
+    description: 'see backend structure in my github.',
+    to: `https://github.com/Adiel-Tzubery/flight_project_django.git`,
   },
   {
-    title: '@material-tailwind/react',
-    description:
-      'Learn how to use @material-tailwind/react, packed with rich components for React.',
+    title: 'react github repository',
+    description: 'see frontend structure in my github.',
+    to: `https://github.com/Adiel-Tzubery/flight_project_react.git`,
   },
   {
-    title: 'Material Tailwind PRO',
-    description:
-      'A complete set of UI Elements for building faster websites in less time.',
+    title: 'django readMe file',
+    description: 'for more information about the backend.',
+    to: `https://github.com/Adiel-Tzubery/flight_project_django/blob/main%E2%80%8F/README.md`,
   },
-]
+  {
+    title: 'react readMe file',
+    description: 'for more information about the frontend.',
+    to: `https://github.com/Adiel-Tzubery/flight_project_react/tree/main/src/readMe.txt`,
+  },
+];
 
 function NavListMenu() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const triggers = {
     onMouseEnter: () => setIsMenuOpen(true),
     onMouseLeave: () => setIsMenuOpen(false),
-  }
+  };
 
-  const renderItems = navListMenuItems.map(({ title, description }) => (
-    <a href="#" key={title}>
+  const renderItems = navListMenuItems.map(({ title, description, to }) => (
+    <a href={to} key={title}>
       <MenuItem>
         <Typography variant="h6" color="blue-gray" className="mb-1">
           {title}
@@ -195,7 +205,7 @@ function NavListMenu() {
         </Typography>
       </MenuItem>
     </a>
-  ))
+  ));
 
   return (
     <React.Fragment>
@@ -206,7 +216,7 @@ function NavListMenu() {
               {...triggers}
               className="hidden items-center gap-2 text-blue-gray-900 lg:flex lg:rounded-full"
             >
-              <Square3Stack3DIcon className="h-[18px] w-[18px]" /> Pages{' '}
+              <CodeBracketIcon className="h-[18px] w-[18px]" /> Source code{' '}
               <ChevronDownIcon
                 strokeWidth={2}
                 className={`h-3 w-3 transition-transform ${
@@ -226,7 +236,7 @@ function NavListMenu() {
             variant="gradient"
             className="col-span-3 grid h-full w-full place-items-center rounded-md"
           >
-            <RocketLaunchIcon strokeWidth={1} className="h-28 w-28" />
+            <img src={githubImage} alt="GitHub Image" className="" />
           </Card>
           <ul className="col-span-4 flex w-full flex-col gap-1">
             {renderItems}
@@ -240,34 +250,27 @@ function NavListMenu() {
         {renderItems}
       </ul>
     </React.Fragment>
-  )
+  );
 }
 
 // nav list component
 const navListItems = [
   {
-    label: 'Account',
-    icon: UserCircleIcon,
+    label: 'About ATravel',
+    icon: DocumentIcon,
+    to: `/about-us`,
   },
-  {
-    label: 'Blocks',
-    icon: CubeTransparentIcon,
-  },
-  {
-    label: 'Docs',
-    icon: CodeBracketSquareIcon,
-  },
-]
+];
 
 function NavList() {
   return (
     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
       <NavListMenu />
-      {navListItems.map(({ label, icon }, key) => (
+      {navListItems.map(({ label, icon, to }, key) => (
         <Typography
           key={label}
           as="a"
-          href="#"
+          href={to}
           variant="small"
           color="blue-gray"
           className="font-normal"
@@ -279,35 +282,39 @@ function NavList() {
         </Typography>
       ))}
     </ul>
-  )
+  );
 }
 
 export default function ComplexNavbar() {
+  const [isNavOpen, setIsNavOpen] = React.useState(false);
+  const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
   // use global state
-  const userData = useStoreState((state) => state?.user?.data || null)
-
-  const [isNavOpen, setIsNavOpen] = React.useState(false)
-  const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur)
+  const userData = useStoreState((state) => state?.user?.data || null);
 
   // adjust navbar size
   useEffect(() => {
     window.addEventListener(
       'resize',
       () => window.innerWidth >= 960 && setIsNavOpen(false)
-    )
-  }, [])
-
-  useEffect(() => {})
+    );
+  }, []);
 
   return (
-    <Navbar className="mx-auto max-w-screen-xl p-2 lg:rounded-full lg:pl-6">
-      <div className="relative mx-auto flex items-center text-blue-gray-900">
+    <Navbar className="mx-auto max-w-screen-xl p-2 lg:rounded-full lg:pl-6 my-0">
+      <div className="relative mx-auto flex items-center text-blue-gray-900 my-0">
         <Typography
           as="a"
-          href="#"
+          href="/"
           className="mr-4 ml-2 cursor-pointer py-1.5 font-medium"
         >
-          Material Tailwind
+          <img src={logo} alt="Logo" className="h-10 w-10" />
+        </Typography>
+        <Typography
+          as="a"
+          href="/"
+          className="mr-4 ml-2 cursor-pointer py-1.5 font-medium"
+        >
+          ATravel | fly smart
         </Typography>
         <div className="absolute top-2/4 left-2/4 hidden -translate-x-2/4 -translate-y-2/4 lg:block">
           <NavList />
@@ -322,7 +329,7 @@ export default function ComplexNavbar() {
           <Bars2Icon className="h-6 w-6" />
         </IconButton>
 
-        {isLoggedIn() ? (
+        {userData ? (
           <ProfileMenu />
         ) : (
           <div className="absolute right-4 flex">
@@ -339,7 +346,7 @@ export default function ComplexNavbar() {
                   {React.createElement(UserIcon, {
                     className: 'h-[18px] w-[18px]',
                   })}{' '}
-                  login
+                  Login
                 </MenuItem>
               </Typography>
             </Link>
@@ -368,5 +375,5 @@ export default function ComplexNavbar() {
         <NavList />
       </MobileNav>
     </Navbar>
-  )
+  );
 }

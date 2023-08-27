@@ -3,7 +3,6 @@ import user from './user'
 
 
 // set global state
-
 const state = {
   user,
 }

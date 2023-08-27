@@ -15,11 +15,6 @@ const DateTimeProvider = ({ name, label, ...props }) => {
           <DateTimePicker {...field} {...props} />
         </DemoContainer>
       </LocalizationProvider>
-      {/* <ErrorMessage
-        name={field.name}
-        component="div"
-        className="text-xs text-red-500"
-      /> */}
     </div>
   )
 }

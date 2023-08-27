@@ -9,7 +9,7 @@ const addFlight = async (props) => {
     departure_time: props.departureTime,
     landing_time: props.landingTime,
     remaining_tickets: props.remainingTickets,
-    price: props.price
+    price: props.price,
   })
   return data
 }

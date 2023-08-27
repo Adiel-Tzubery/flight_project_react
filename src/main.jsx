@@ -1,12 +1,15 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import 'react-toastify/dist/ReactToastify.css'
-import App from './App.jsx'
-import { StoreProvider } from 'easy-peasy'
-import { store } from './state/index'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
 
-import { ThemeProvider } from '@material-tailwind/react'
+// setup for the global store
+import { StoreProvider } from 'easy-peasy';
+import { store } from './state/index';
+
+// setup for the css
+import './index.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { ThemeProvider } from '@material-tailwind/react';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,4 +19,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </StoreProvider>
     </ThemeProvider>
   </React.StrictMode>
-)
+);
