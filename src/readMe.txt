@@ -1,1 +1,1 @@
-will contain the frontend structure explanations in details.
+REACT FLIGHT SYSTEM:
